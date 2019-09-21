@@ -12,12 +12,8 @@ const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
-const tourRouter = require('./routes/tourRoutes');
-const userRouter = require('./routes/userRoutes');
-const reviewRouter = require('./routes/reviewRoutes');
-const bookingRouter = require('./routes/bookingRoutes');
-const bookingController = require('./controllers/bookingController');
-const viewRouter = require('./routes/viewRoutes');
+const postRouter = require('./routes/postRoutes');
+const categoryRouter = require('./routes/categoryRoutes');
 
 const app = express();
 
@@ -51,15 +47,12 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-//
-app.post(
-  '/webhook-checkout',
-  express.raw({ type: 'application/json' }),
-  bookingController.webhookCheckout
-);
-
 // Body parser, reading data from body into req.body
-app.use(express.json({ limit: '10kb' }));
+app.use(
+  express.json({
+    limit: '10kb'
+  })
+);
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(cookieParser());
 
@@ -73,14 +66,14 @@ app.use(xss());
 app.use(
   hpp({
     // Can make a function to add all key of model here
-    whitelist: [
-      'duration',
-      'ratingsQuantity',
-      'ratingsAverage',
-      'maxGroupSize',
-      'difficulty',
-      'price'
-    ]
+    // whitelist: [
+    //   'duration',
+    //   'ratingsQuantity',
+    //   'ratingsAverage',
+    //   'maxGroupSize',
+    //   'difficulty',
+    //   'price'
+    // ]
   })
 );
 
@@ -89,13 +82,13 @@ app.use(compression());
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  // console.log(req.cookies);
   next();
 });
 
 // 3) ROUTES
 // app.use('/', viewRouter);
-app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/posts', postRouter);
+app.use('/api/v1/categories', categoryRouter);
 // app.use('/api/v1/users', userRouter);
 // app.use('/api/v1/reviews', reviewRouter);
 // app.use('/api/v1/bookings', bookingRouter);
