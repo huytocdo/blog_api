@@ -27,13 +27,16 @@ router
   .post(postController.createPost);
 
 router
-  .route('/id/:id')
+  .route('/:id')
   .get(postController.getPost)
   .patch(postController.updatePost)
   .delete(postController.deletePost);
 router
-  .route('/:slug')
+  .route('/slug/:slug')
   .get(postController.setPostSlug, postController.getAllPostsWithRelated);
+router
+  .route('/category/:slug')
+  .get(postController.getPostByCategorySlug, postController.getAllPosts);
 
 // .patch(
 //   authController.protect,

@@ -13,7 +13,8 @@ const categorySchema = new mongoose.Schema({
     maxlength: [15, 'A post name must have less or equal than 15 characters']
   },
   slug: {
-    type: String
+    type: String,
+    unique: true
   }
 });
 
