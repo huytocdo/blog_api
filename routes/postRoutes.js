@@ -33,7 +33,7 @@ router
   .delete(postController.deletePost);
 router
   .route('/:slug')
-  .get(postController.setPostSlug, postController.getAllPosts);
+  .get(postController.setPostSlug, postController.getAllPostsWithRelated);
 
 // .patch(
 //   authController.protect,

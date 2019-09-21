@@ -1,10 +1,15 @@
 const Post = require('./../models/postModel');
-// const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
-// const AppError = require('./../utils/appError');
 
 exports.getAllPosts = factory.getAll(Post);
-exports.getPost = factory.getOne(Post);
+exports.getPost = factory.getOne(Post, {
+  path: 'related',
+  select: '-html -related'
+});
+exports.getAllPostsWithRelated = factory.getAll(Post, {
+  path: 'related',
+  select: '-html -related'
+});
 exports.setPostSlug = (req, res, next) => {
   req.query.slug = req.params.slug;
   next();

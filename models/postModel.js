@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const Entities = require('html-entities').AllHtmlEntities;
+const TimeFormat = require('./../utils/timeFormat');
 // const User = require('./userModel');
 // const validator = require('validator');
 // 2) CREATE SCHEMA
@@ -41,16 +42,21 @@ const postSchema = new mongoose.Schema(
     },
     createdAt: {
       type: Date,
-      default: Date.now(),
-      select: false
-    }
-    // Link to category
-    // categories: [
-    //   {
-    //     type: mongoose.Schema.ObjectId,
-    //     ref: 'Category'
-    //   }
-    // ]
+      default: Date.now()
+      // select: false
+    },
+    categories: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Category'
+      }
+    ],
+    related: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Post'
+      }
+    ]
   },
   {
     toJSON: { virtuals: true },
@@ -59,6 +65,10 @@ const postSchema = new mongoose.Schema(
 );
 
 postSchema.index({ slug: 1 });
+
+postSchema.virtual('date').get(function() {
+  return TimeFormat.formatVNDate(this.createdAt);
+});
 
 // DOCUMENT MIDDLEWARE: runs before .save() and .create()
 postSchema.pre('save', function(next) {
@@ -71,16 +81,23 @@ postSchema.pre('save', function(next) {
   next();
 });
 
+postSchema.pre(/^find/, function(next) {
+  this.populate('categories');
+  next();
+});
+
 postSchema.post(/^find/, function(docs, next) {
   if (!docs) next();
   const entities = new Entities();
   if (Array.isArray(docs)) {
     docs = docs.map(doc => {
+      if (!doc.html) return doc;
       doc.html = entities.decode(doc.html);
       return doc;
     });
     next();
   }
+  if (!docs.html) next();
   docs.html = entities.decode(docs.html);
   next();
 });
