@@ -56,7 +56,12 @@ const postSchema = new mongoose.Schema(
         type: mongoose.Schema.ObjectId,
         ref: 'Post'
       }
-    ]
+    ],
+    active: {
+      type: Boolean,
+      default: true,
+      select: false
+    }
   },
   {
     toJSON: { virtuals: true },
@@ -82,7 +87,10 @@ postSchema.pre('save', function(next) {
 });
 
 postSchema.pre(/^find/, function(next) {
+  // Populate Categories
   this.populate('categories');
+  // Remove inactive
+  this.find({ active: { $ne: false } });
   next();
 });
 

@@ -9,18 +9,17 @@ const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const cors = require('cors');
-
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const postRouter = require('./routes/postRoutes');
 const categoryRouter = require('./routes/categoryRoutes');
+const userRouter = require('./routes/userRoutes');
+const resourcesRouter = require('./routes/resourceRoutes');
 
 const app = express();
 
 app.enable('trust proxy');
 
-app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
 // Serving static file
 app.use(cors());
 // app.use(cors({
@@ -86,12 +85,10 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES
-// app.use('/', viewRouter);
 app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/categories', categoryRouter);
-// app.use('/api/v1/users', userRouter);
-// app.use('/api/v1/reviews', reviewRouter);
-// app.use('/api/v1/bookings', bookingRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/resources', resourcesRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

@@ -10,11 +10,19 @@ const categorySchema = new mongoose.Schema({
     required: [true, 'A category must have a name'],
     unique: true,
     trim: true,
-    maxlength: [15, 'A post name must have less or equal than 15 characters']
+    maxlength: [
+      15,
+      'A category name must have less or equal than 15 characters'
+    ]
   },
   slug: {
     type: String,
     unique: true
+  },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
   }
 });
 
@@ -25,6 +33,12 @@ categorySchema.pre('save', function(next) {
     remove: /[*+~.()'"!:@]/g,
     lower: true
   });
+  next();
+});
+
+categorySchema.pre(/^find/, function(next) {
+  // Remove inactive
+  this.find({ active: { $ne: false } });
   next();
 });
 

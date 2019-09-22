@@ -1,36 +1,30 @@
 const express = require('express');
 const postController = require('./../controllers/postController');
-// const authController = require('./../controllers/authController');
-// const reviewRouter = require('./../routes/reviewRoutes');
+const authController = require('./../controllers/authController');
 
 const router = express.Router();
-
-// router.use('/:tourId/reviews', reviewRouter);
-
-// router
-//   .route('/monthly-plan/:year')
-//   .get(
-//    authController.protect,
-//    authController.restrictTo('admin', 'lead-guide', 'guide'),
-//     tourController.getMonthlyPlan
-//   );
-
-// router
-//   .route('/tours-within/:distance/center/:latlng/unit/:unit')
-//   .get(tourController.getToursWithin);
-
-// router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
-
 router
   .route('/')
   .get(postController.getAllPosts)
-  .post(postController.createPost);
+  .post(
+    authController.protect,
+    authController.restrictTo('admin'),
+    postController.createPost
+  );
 
 router
   .route('/:id')
   .get(postController.getPost)
-  .patch(postController.updatePost)
-  .delete(postController.deletePost);
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin'),
+    postController.updatePost
+  )
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin'),
+    postController.deletePost
+  );
 router
   .route('/slug/:slug')
   .get(postController.setPostSlug, postController.getAllPostsWithRelated);
@@ -38,16 +32,4 @@ router
   .route('/category/:slug')
   .get(postController.getPostByCategorySlug, postController.getAllPosts);
 
-// .patch(
-//   authController.protect,
-//   authController.restrictTo('admin', 'lead-guide'),
-//   tourController.uploadTourImages,
-//   tourController.resizeTourImages,
-//   tourController.updateTour
-// )
-// .delete(
-//   authController.protect,
-//   authController.restrictTo('admin', 'lead-guide'),
-//   tourController.deleteTour
-// );
 module.exports = router;
