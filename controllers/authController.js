@@ -14,10 +14,9 @@ const signToken = id => {
 const createSendToken = async (user, statusCode, req, res) => {
   // TODO Lúc nào cũng send user về???
   const token = signToken(user._id);
+  const expires = process.env.JWT_COOKIE_EXPIRES_IN;
   const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + expires * 24 * 60 * 60 * 1000),
     httpOnly: true,
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
   };
@@ -34,6 +33,7 @@ const createSendToken = async (user, statusCode, req, res) => {
   res.status(statusCode).json({
     status: 'success',
     token: token,
+    expires,
     data: {
       user
     }
@@ -111,35 +111,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   res.locals.user = currentUser;
   next();
 });
-
-// exports.isLoggedIn = async (req, res, next) => {
-//   // Getting token and check if it's there
-//   try {
-//     if (req.cookies.jwt) {
-//       const decoded = await promisify(jwt.verify)(
-//         req.cookies.jwt,
-//         process.env.JWT_SECRET
-//       );
-//       // Check if user exists
-//       const currentUser = await User.findById(decoded.id);
-//       if (!currentUser) {
-//         return next();
-//       }
-
-//       // Check if user changed password after the token was issued
-//       if (currentUser.changedPasswordAfter(decoded.iat)) {
-//         return next();
-//       }
-
-//       // THERE IS A LOGGED IN USER
-//       res.locals.user = currentUser;
-//       return next();
-//     }
-//     return next();
-//   } catch (err) {
-//     return next();
-//   }
-// };
 
 exports.logout = async (req, res) => {
   res.cookie('jwt', 'loggedout', {

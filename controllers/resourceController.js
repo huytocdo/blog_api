@@ -23,7 +23,8 @@ const upload = multer({
 exports.uploadImage = upload.single('photo');
 
 exports.resizeImage = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
+  if (!req.file)
+    return next(new AppError('Please upload an images.', 400), false);
   const { name } = req.body;
   const slug = slugify(name, { remove: /[*+~.()'"!:@]/g, lower: true });
   req.file.filename = `${slug}-${Date.now()}.jpeg`;
