@@ -40,11 +40,6 @@ const postSchema = new mongoose.Schema(
       trim: true,
       required: [true, 'A post must have a duration']
     },
-    createdAt: {
-      type: Date,
-      default: Date.now()
-      // select: false
-    },
     categories: [
       {
         type: mongoose.Schema.ObjectId,
@@ -70,7 +65,8 @@ const postSchema = new mongoose.Schema(
   },
   {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    timestamps: true
   }
 );
 

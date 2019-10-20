@@ -1,4 +1,5 @@
 /node_modules
+/public/img/uploaded
 /.vscode
 .cache/
 *.env
