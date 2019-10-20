@@ -21,14 +21,6 @@ const createSendToken = async (user, statusCode, req, res) => {
     secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
   };
   res.cookie('jwt', token, cookieOptions);
-  await User.findByIdAndUpdate(
-    user._id,
-    { $set: { token: token } },
-    {
-      new: true,
-      runValidators: true
-    }
-  );
   user.password = undefined;
   res.status(statusCode).json({
     status: 'success',
@@ -96,9 +88,6 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (!currentUser.token || currentUser.token !== token) {
-    return next(new AppError('Invalid token'));
-  }
   // 4) Check if user changed password after the token was issued
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
@@ -164,7 +153,6 @@ exports.checkSignIn = catchAsync(async (req, res, next) => {
 
   if (!currentUser) return next();
 
-  if (!currentUser.token || currentUser.token !== token) return next();
   // 4) Check if user changed password after the token was issued
   if (currentUser.changedPasswordAfter(decoded.iat)) return next();
 
