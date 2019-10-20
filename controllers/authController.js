@@ -139,3 +139,37 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+/*
+  check Sign In only check if the user is login or not, If user is login, the user information will return in req.user
+*/
+exports.checkSignIn = catchAsync(async (req, res, next) => {
+  // 1) Getting token and check if it's there
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) return next();
+  // 2) Verification token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // 3) Check if user still exists
+  const currentUser = await User.findById(decoded.id).select('+token');
+
+  if (!currentUser) return next();
+
+  if (!currentUser.token || currentUser.token !== token) return next();
+  // 4) Check if user changed password after the token was issued
+  if (currentUser.changedPasswordAfter(decoded.iat)) return next();
+
+  // GRANT ACCESS TO PROTECTED ROUTE
+  req.user = currentUser;
+  res.locals.user = currentUser;
+  next();
+});

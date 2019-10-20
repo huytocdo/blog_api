@@ -5,7 +5,11 @@ const authController = require('./../controllers/authController');
 const router = express.Router();
 router
   .route('/')
-  .get(postController.getAllPosts)
+  .get(
+    authController.checkSignIn,
+    postController.getAllPublishedPost,
+    postController.getAllPosts
+  )
   .post(
     authController.protect,
     authController.restrictTo('admin'),

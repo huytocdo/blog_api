@@ -25,6 +25,11 @@ exports.getPostByCategorySlug = catchAsync(async (req, res, next) => {
   req.query.categories = category._id;
   next();
 });
+exports.getAllPublishedPost = catchAsync(async (req, res, next) => {
+  if (req.user && req.user.role === 'admin') return next();
+  req.query.status = 'published';
+  next();
+});
 exports.createPost = factory.createOne(Post);
 exports.updatePost = factory.updateOne(Post);
 exports.deletePost = factory.deleteOne(Post);
