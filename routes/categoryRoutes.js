@@ -24,6 +24,7 @@ router
   .patch(
     authController.protect,
     authController.restrictTo('admin'),
+    categoryController.makeSlug,
     categoryController.updateCategory
   );
 
