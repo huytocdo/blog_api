@@ -31,10 +31,10 @@ exports.resizeImage = catchAsync(async (req, res, next) => {
   await sharp(req.file.buffer)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`public/img/uploaded/${req.file.filename}`);
+    .toFile(`${process.env.UPLOAD_PATH}/${req.file.filename}`);
   const image = {
     name,
-    link: `/img/uploaded/${req.file.filename}`
+    link: `/uploaded/${req.file.filename}`
   };
   req.body = image;
   next();

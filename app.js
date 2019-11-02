@@ -28,7 +28,6 @@ app.use(cors());
 
 app.options('*', cors());
 // app.options('/api/v1/tours/:id', cors());
-app.use(express.static(path.join(__dirname, 'public')));
 // 1) GLOBAL MIDDLEWARES
 // Set security HTTP headers
 app.use(helmet());
@@ -89,9 +88,11 @@ app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/categories', categoryRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/resources', resourcesRouter);
-
+app.use('/uploaded', express.static(process.env.UPLOAD_PATH));
+app.use(express.static(process.env.SPA_WEB_PATH));
 app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+  res.sendFile('index.html', { root: process.env.SPA_WEB_PATH });
+  // next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
 app.use(globalErrorHandler);
