@@ -28,13 +28,14 @@ exports.resizeImage = catchAsync(async (req, res, next) => {
   const { name } = req.body;
   const slug = slugify(name, { remove: /[*+~.()'"!:@]/g, lower: true });
   req.file.filename = `${slug}-${Date.now()}.jpeg`;
+  const host = req.get('host');
   await sharp(req.file.buffer)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`${process.env.UPLOAD_PATH}/${req.file.filename}`);
   const image = {
     name,
-    link: `/uploaded/${req.file.filename}`
+    link: `//${host}/uploaded/${req.file.filename}`
   };
   req.body = image;
   next();
