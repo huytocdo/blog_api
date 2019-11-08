@@ -1,4 +1,4 @@
-const path = require('path');
+// const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -9,24 +9,31 @@ const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const cors = require('cors');
-const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const postRouter = require('./routes/postRoutes');
 const categoryRouter = require('./routes/categoryRoutes');
 const userRouter = require('./routes/userRoutes');
 const resourcesRouter = require('./routes/resourceRoutes');
+const AppError = require('./utils/appError');
 
 const app = express();
 
 app.enable('trust proxy');
 
-// Serving static file
+// CORS domain
 app.use(cors());
-// app.use(cors({
-//   origin: 'https://www.natours.com'
-// }));
+const whitelistDomain = process.env.WHITE_LIST.split(' ');
+const corOptions = {
+  origin: function(origin, callback) {
+    if (whitelistDomain.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new AppError('Not allowed by CORS'));
+    }
+  }
+};
+app.use('/api', cors(corOptions));
 
-app.options('*', cors());
 // app.options('/api/v1/tours/:id', cors());
 // 1) GLOBAL MIDDLEWARES
 // Set security HTTP headers
