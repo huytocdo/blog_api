@@ -103,7 +103,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.logout = async (req, res) => {
   res.cookie('jwt', 'loggedout', {
-    expires: new Date(Date.now() + 10 * 1000),
+    expires: new Date(Date.now() + 5 * 1000),
     httpOnly: true
   });
   await User.findByIdAndUpdate(
@@ -161,3 +161,18 @@ exports.checkSignIn = catchAsync(async (req, res, next) => {
   res.locals.user = currentUser;
   next();
 });
+
+exports.getUserInfo = (req, res, next) => {
+  if (res.locals.user) {
+    res.status(200).json({
+      status: 'success',
+      data: {
+        user: res.locals.user
+      }
+    });
+  } else {
+    return next(
+      new AppError('You are not login! Please log in to get access', 401)
+    );
+  }
+};
