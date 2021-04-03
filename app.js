@@ -22,7 +22,7 @@ app.enable('trust proxy');
 
 // CORS domain
 app.use(cors());
-const whitelistDomain = process.env.WHITE_LIST.split(' ');
+const whitelistDomain = (process.env.WHITE_LIST || '').split(' ');
 const corOptions = {
   origin: function(origin, callback) {
     if (whitelistDomain.indexOf(origin) !== -1 || !origin) {
